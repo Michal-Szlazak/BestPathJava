@@ -1,16 +1,14 @@
 package com.example.bestpath;
 
-import java.io.*;
 import java.util.LinkedList;
 
 public class Path {
 
-    public static boolean dijkstra(double graph[][], int startingVertex, int endingVertex, int rows, int columns, ListOfPaths pathList) {
+    public static boolean dijkstra(double[][] graph, int startingVertex, int endingVertex, int rows, int columns, ListOfPaths pathList) {
 
         int[] visited = new int[rows * columns];
         double[] path = new double[rows * columns];
         int[] prev = new int[rows * columns];
-        int is_able_to_move = 0;
         double curr_path_len;
         double lowest = -1;
         int vert_lowest = -1;
@@ -89,8 +87,8 @@ public class Path {
 
         int vert_act;
         int g = 0;
-        LinkedList<Integer> write_path = new LinkedList<Integer>();
-        LinkedList<Double> scale_weight = new LinkedList<Double>();
+        LinkedList<Integer> write_path = new LinkedList<>();
+        LinkedList<Double> scale_weight = new LinkedList<>();
 
 
         vert_act = endingVertex;
@@ -113,8 +111,8 @@ public class Path {
 
             }
 
-        int writePath [] = new int [write_path.size()];
-        double scaleWeight [] = new double [scale_weight.size()];
+        int[] writePath = new int [write_path.size()];
+        double[] scaleWeight = new double [scale_weight.size()];
 
         for( int i = 0; i < write_path.size(); i++ ){
             writePath[i] = write_path.get(i);

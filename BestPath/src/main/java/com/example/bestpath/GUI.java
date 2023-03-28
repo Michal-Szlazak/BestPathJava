@@ -1,5 +1,7 @@
 package com.example.bestpath;
 
+import com.example.bestpath.Graph.*;
+import com.example.bestpath.Printers.VisualGraph;
 import javafx.scene.Group;
 import javafx.scene.control.TextField;
 
@@ -35,43 +37,47 @@ public class GUI {
 
         String fileName = textFieldFileName.getText();
         textFieldFileName.setText("");
-        int Rows = -1;
-        int Columns = -1;
+        GraphFromFile graphFromFile;
+        int rows = -1;
+        int columns = -1;
+        double maxEdge = 0;
+        double minEdge = 0;
         double[][] graph = null;
 
-         Main.isFormatOk = false;
+        Main.isFormatOk = false;
         try {
             Main.isFormatOk = GraphFromFile.checkFileFormat(fileName);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if(Main.isFormatOk == true) {
+        if(Main.isFormatOk) {
 
             try {
-                graph = GraphFromFile.readFile(fileName);
+                GraphFileReader graphFileReader = new GraphFileReader();
+                graph = graphFileReader.readFile(fileName);
+                rows = graphFileReader.getRows(fileName);
+                columns = graphFileReader.getColumns(fileName);
+                maxEdge = graphFileReader.getMaxEdge();
+                minEdge = graphFileReader.getMinEdge();
+                graphFromFile = new GraphFromFile("Draw weights", rows, columns, minEdge, maxEdge, fileName);
+                graphFromFile.setGraphEdges(graph);
+                return graphFromFile;
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            try {
+                rows = GraphFromFile.getRows(fileName);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                columns = GraphFromFile.getColumns(fileName);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
-
-
-        try {
-            Rows = GraphFromFile.getRows(fileName);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            Columns = GraphFromFile.getColumns(fileName);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        System.out.println(GraphFromFile.minEdge + " " + GraphFromFile.maxEdge);
-
-        Graph graphFromFile = new GraphFromFile("Draw weights", Rows, Columns, GraphFromFile.minEdge, GraphFromFile.maxEdge);
-        graphFromFile.setGraphEdges(graph);
-
-        return graphFromFile;
+        return null;
     }
 
 }

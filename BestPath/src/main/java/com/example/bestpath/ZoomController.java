@@ -1,9 +1,8 @@
 package com.example.bestpath;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import com.example.bestpath.Graph.Graph;
+import com.example.bestpath.Printers.PathPrinter;
+import com.example.bestpath.Printers.VisualGraph;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -13,31 +12,25 @@ public class ZoomController {
     public void setZoomSlider(Slider zoomSlider, Label zoomProcentageLabel){
 
         zoomSlider.valueProperty().addListener(
-                new ChangeListener<Number>() {
-                    @Override
-                    public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
-                        double resize = 100 - (double)newValue;
-                        int reresize = (int)resize;
-                        zoomProcentageLabel.setText(String.valueOf(reresize) + "%");
-                    }
+                (observableValue, oldValue, newValue) -> {
+                    double resize = 100 - (double)newValue;
+                    int resized = (int)resize;
+                    zoomProcentageLabel.setText(resized + "%");
                 }
         );
 
     }
 
-    public void applyZoom(Button applyZoomButton, Label zoomProcentageLabel, VisualGraph visualGraph, Graph generatedGraph, Group vertexes, Group arrows, boolean writePaths, DrawPath drawPath){
+    public void applyZoom(Button applyZoomButton, Label zoomProcentageLabel, VisualGraph visualGraph, Graph generatedGraph, Group vertexes, Group arrows, boolean writePaths, PathPrinter drawPath){
 
-        applyZoomButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                double size = Double.parseDouble((zoomProcentageLabel.getText().replace("%", "")));
-                visualGraph.resize(size/100);
-                visualGraph.rePrintGraph(generatedGraph, vertexes, arrows, writePaths);
+        applyZoomButton.setOnAction(actionEvent -> {
+            int size = Integer.parseInt((zoomProcentageLabel.getText().replace("%", "")));
+            visualGraph.resize(size);
+            visualGraph.rePrintGraph(generatedGraph, vertexes, arrows, writePaths);
 
-                drawPath.resize(size/100);
-                drawPath.reprintPath();
+            drawPath.resize(size);
+            drawPath.reprintPath();
 
-            }
         });
 
     }

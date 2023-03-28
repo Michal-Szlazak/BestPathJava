@@ -6,8 +6,6 @@ import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
-import java.util.LinkedList;
-
 public class PathButtons {
 
     public Label numPath;
@@ -65,7 +63,4 @@ public class PathButtons {
         PathButtons.yCoordinate = 26;
         PathButtons.xCoordinate = 5;
     }
-
-
-
 }

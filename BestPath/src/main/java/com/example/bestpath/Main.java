@@ -1,10 +1,9 @@
 package com.example.bestpath;
 
+import com.example.bestpath.Graph.Graph;
+import com.example.bestpath.Printers.PathPrinter;
+import com.example.bestpath.Printers.VisualGraph;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -18,7 +17,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.LinkedList;
@@ -28,7 +26,6 @@ import java.util.ResourceBundle;
 public class Main extends Application implements Initializable {
 
     public static ListOfPaths pathList = new ListOfPaths();
-    private static double[][] graph = null;
     private final int graphSize = 20;
     private static Graph currentGraph = null;
 
@@ -38,8 +35,6 @@ public class Main extends Application implements Initializable {
     public static int Rows = -1;
     public static int Columns = -1;
 
-    @FXML
-    private MenuItem help;
     @FXML
     private CheckBox writeScales;
     @FXML
@@ -75,11 +70,6 @@ public class Main extends Application implements Initializable {
 
     @FXML
     private AnchorPane anchorPaneForGrid;
-
-    @FXML
-    private TitledPane pathsFoundPane;
-    @FXML
-    private GridPane pathsFoundGridPane;
     @FXML
     private Button hideButton;
     @FXML
@@ -96,15 +86,13 @@ public class Main extends Application implements Initializable {
     private double endingWeightFromGui;
 
 
-    public static LinkedList<PathButtons> listPathButtons = new LinkedList<PathButtons>();
+    public static LinkedList<PathButtons> listPathButtons = new LinkedList<>();
     public static Group rectanglesAndVertexesPath;
     public static Group paths;
 
-    public static DrawPath drawPath = null;
+    public static PathPrinter drawPath = null;
     private String mode;
-    private Pane pane = new Pane();
-
-    private Pane pathPane = new Pane();
+    private final Pane pane = new Pane();
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -154,126 +142,110 @@ public class Main extends Application implements Initializable {
 
         fileController.setSearchFile(searchFromFile, txtFieldFromFile);
 
-        openFileButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
+        openFileButton.setOnAction(actionEvent -> {
 
+            if(txtFieldFromFile.getText().equals("")){
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("No file to open!");
+                alert.setContentText("You have to add file name, before trying to open it.");
+                alert.show();
+                return;
+            }
 
-                if(txtFieldFromFile.getText().equals("")){
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("No file to open!");
-                    alert.setContentText("You have to add file name, before trying to open it.");
-                    alert.show();
-                    return;
-                }
+            Graph graphFromFile = gui.createGraphFromFile(txtFieldFromFile);
+            if(graphFromFile != null) {
+                visualGraph.setSize(graphSize);
+                visualGraph.printNewGraph(graphFromFile, vertexes, arrows, writeScales.isSelected());
 
-                Graph graphFromFile = gui.createGraphFromFile(txtFieldFromFile);
-
-                VisualGraph visualGraph = new VisualGraph();
-
+                drawPath = new PathPrinter(pathList, rectanglesAndVertexesPath, listPathButtons, currentGraph);
                 currentGraph = graphFromFile;
-
-                drawPath = new DrawPath(pathList, rectanglesAndVertexesPath, listPathButtons, currentGraph);
-
                 zoomController.setZoomSlider(zoomOutSlider, zoomProcentageLabel);
                 zoomController.applyZoom(applyZoomButton, zoomProcentageLabel, visualGraph, graphFromFile, vertexes, arrows, writeScales.isSelected(), drawPath);
-
-
             }
+
+
         });
 
-        generateButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
+        generateButton.setOnAction(actionEvent -> {
 
 
-                DrawPath.setSize(graphSize);
-                DrawPath.dropPaths();
-                gridPane.getChildren().clear();
+            PathPrinter.setSize(graphSize);
+            PathPrinter.dropPaths();
+            gridPane.getChildren().clear();
 
-                InputCorrection inputCorrection = new InputCorrection();
-                boolean isInputCorrect = inputCorrection.checkInputCorrection(
-                        rowsGUI.getText(),
-                        columnsGUI.getText(),
-                        startingWeightGUI.getText(),
-                        endingWeightGUI.getText(),
-                        (RadioButton) modeGUI.getSelectedToggle()
-                );
+            InputCorrection inputCorrection = new InputCorrection();
+            boolean isInputCorrect = inputCorrection.checkInputCorrection(
+                    rowsGUI.getText(),
+                    columnsGUI.getText(),
+                    startingWeightGUI.getText(),
+                    endingWeightGUI.getText(),
+                    (RadioButton) modeGUI.getSelectedToggle()
+            );
 
-                if(!isInputCorrect){
-                    return;
-                }
-
-                rowsFromGui = Integer.parseInt(rowsGUI.getText());
-                columnsFromGui = Integer.parseInt(columnsGUI.getText());
-                startingWeightFromGui = Double.parseDouble(startingWeightGUI.getText());
-                endingWeightFromGui = Double.parseDouble(endingWeightGUI.getText());
-                getSelectedButton = (RadioButton) modeGUI.getSelectedToggle();
-                mode = getSelectedButton.getText();
-
-                Graph generatedGraph;
-
-                visualGraph.setSize(graphSize);
-                generatedGraph = gui.generate(visualGraph, mode, rowsFromGui, columnsFromGui, startingWeightFromGui, endingWeightFromGui, vertexes, arrows, writeScales.isSelected());
-                currentGraph = generatedGraph;
-
-                drawPath = new DrawPath(pathList, rectanglesAndVertexesPath, listPathButtons, currentGraph);
-
-                fileController.setSearchFile(searchFromFile, txtFieldFromFile);
-                fileController.setSearchDirectory(searchSaveToFile,txtFieldSaveToFileDirectory);
-                fileController.setSaveButton(saveToFileButton, txtFieldSaveToFile, txtFieldSaveToFileDirectory, currentGraph);
-
-                zoomController.setZoomSlider(zoomOutSlider, zoomProcentageLabel);
-                zoomController.applyZoom(applyZoomButton, zoomProcentageLabel, visualGraph,
-                        currentGraph, vertexes, arrows, writeScales.isSelected(), drawPath);
+            if(!isInputCorrect){
+                return;
             }
+
+            rowsFromGui = Integer.parseInt(rowsGUI.getText());
+            columnsFromGui = Integer.parseInt(columnsGUI.getText());
+            startingWeightFromGui = Double.parseDouble(startingWeightGUI.getText());
+            endingWeightFromGui = Double.parseDouble(endingWeightGUI.getText());
+            getSelectedButton = (RadioButton) modeGUI.getSelectedToggle();
+            mode = getSelectedButton.getText();
+
+            Graph generatedGraph;
+
+            visualGraph.setSize(graphSize);
+            generatedGraph = gui.generate(visualGraph, mode, rowsFromGui, columnsFromGui, startingWeightFromGui, endingWeightFromGui, vertexes, arrows, writeScales.isSelected());
+            System.out.println(arrows.getChildren());
+            currentGraph = generatedGraph;
+
+            drawPath = new PathPrinter(pathList, rectanglesAndVertexesPath, listPathButtons, currentGraph);
+
+            fileController.setSearchFile(searchFromFile, txtFieldFromFile);
+            fileController.setSearchDirectory(searchSaveToFile,txtFieldSaveToFileDirectory);
+            fileController.setSaveButton(saveToFileButton, txtFieldSaveToFile, txtFieldSaveToFileDirectory, currentGraph);
+
+            zoomController.setZoomSlider(zoomOutSlider, zoomProcentageLabel);
+            zoomController.applyZoom(applyZoomButton, zoomProcentageLabel, visualGraph,
+                    currentGraph, vertexes, arrows, writeScales.isSelected(), drawPath);
         });
 
 
-        findButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-
-                if(VisualGraph.startingVertex != -2 && VisualGraph.endingVertex != -2) {
-                    isPathFound = Path.dijkstra(currentGraph.graph, VisualGraph.startingVertex, VisualGraph.endingVertex, currentGraph.rows, currentGraph.columns, pathList);
-                    if(isPathFound == true) {
-                        listPathButtons.addLast(new PathButtons(gridPane, paths, VisualGraph.startingVertex, VisualGraph.endingVertex));
-                    }
-                    else{
-                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                        alert.setTitle("Path nonexistent.");
-                        alert.setContentText("There is no path between vertexes that You have chosen.");
-                        alert.show();
-                    }
-                    currentGraph.vertexes[VisualGraph.startingVertex].setFill(Color.DARKGRAY);
-                    currentGraph.vertexes[VisualGraph.endingVertex].setFill(Color.DARKGRAY);
-                    VisualGraph.startingVertex = -2;
-                    VisualGraph.endingVertex = -2;
-                    VisualGraph.chosen = 0;
+        findButton.setOnAction(actionEvent -> {
+            if(VisualGraph.startingVertex != -2 && VisualGraph.endingVertex != -2) {
+                isPathFound = Path.dijkstra(currentGraph.graph, VisualGraph.startingVertex, VisualGraph.endingVertex, currentGraph.rows, currentGraph.columns, pathList);
+                if(isPathFound) {
+                    listPathButtons.addLast(new PathButtons(gridPane, paths, VisualGraph.startingVertex, VisualGraph.endingVertex));
                 }
+                else{
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Path nonexistent.");
+                    alert.setContentText("There is no path between vertexes that You have chosen.");
+                    alert.show();
+                }
+                currentGraph.vertexes[VisualGraph.startingVertex].setFill(Color.DARKGRAY);
+                currentGraph.vertexes[VisualGraph.endingVertex].setFill(Color.DARKGRAY);
+                VisualGraph.startingVertex = -2;
+                VisualGraph.endingVertex = -2;
+                VisualGraph.chosen = 0;
             }
         });
 
 
-        showButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
+        showButton.setOnAction(actionEvent -> {
 
-                if(currentGraph != null) {
-                    drawPath = new DrawPath(pathList, rectanglesAndVertexesPath, listPathButtons, currentGraph);
-                    drawPath.drawPath();
-                }
+            if(currentGraph != null) {
+                drawPath = new PathPrinter(pathList, rectanglesAndVertexesPath, listPathButtons, currentGraph);
+                drawPath.drawPath();
             }
         });
 
-        hideButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                if(drawPath != null) {
-                    drawPath.hidePaths(rectanglesAndVertexesPath);
-                }
-                drawPath = null;
+        hideButton.setOnAction(actionEvent -> {
+            if(drawPath != null) {
+                drawPath.hidePaths(rectanglesAndVertexesPath);
             }
+            drawPath = null;
         });
     }
 

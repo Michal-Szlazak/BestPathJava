@@ -1,8 +1,6 @@
 package com.example.bestpath;
-import java.io.*;
-import java.util.ArrayList;
+
 import java.util.LinkedList;
-import javafx.scene.Group;
 
 public class ListOfPaths {
 
@@ -11,8 +9,8 @@ public class ListOfPaths {
    public LinkedList<double[]> weightList;
 
    public ListOfPaths (){
-       vertexList =  new LinkedList<int[]>();
-       weightList = new LinkedList<double[]>();
+       vertexList = new LinkedList<>();
+       weightList = new LinkedList<>();
    }
 
    public void addPath(int[] vertexPath, double[] weightPath){
@@ -21,12 +19,4 @@ public class ListOfPaths {
         weightList.addLast(weightPath);
 
    }
-
-   public void addPathToGroup(){
-
-
-   }
-
-
-
 }

@@ -1,5 +1,6 @@
 package com.example.bestpath;
 
+import com.example.bestpath.Graph.Graph;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.Region;
 
@@ -9,9 +10,9 @@ import java.io.IOException;
 
 public class SaveGraph {
 
-    private double[][] graphEdges;
-    private int rows;
-    private int columns;
+    private final double[][] graphEdges;
+    private final int rows;
+    private final int columns;
 
     SaveGraph(Graph graph){
         this.rows = graph.getRows();
@@ -106,10 +107,10 @@ public class SaveGraph {
             return false;
         }
 
-        return fileAlredyExists(path, fileName);
+        return fileAlreadyExists(path, fileName);
     }
 
-    public static boolean fileAlredyExists(String path, String fileName) {
+    public static boolean fileAlreadyExists(String path, String fileName) {
 
         File directory = new File(path);
 

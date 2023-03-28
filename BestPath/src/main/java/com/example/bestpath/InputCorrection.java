@@ -5,8 +5,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.layout.Region;
 
 public class InputCorrection {
-
-    private GraphFromFile graphFromFile;
     public boolean checkInputCorrection(String rows, String columns, String startingWeight, String endingWeight, RadioButton selectedMode){
 
         boolean isInputCorrect = true;
@@ -126,7 +124,7 @@ public class InputCorrection {
         Alert alert = new Alert(Alert.AlertType.ERROR);
 
         try {
-            endingWeightDouble = Double.parseDouble(startingWeight);
+            endingWeightDouble = Double.parseDouble(endingWeight);
         }
         catch (NumberFormatException e){
             alert.setHeaderText("Error: Ending Weight - wrong input.");
@@ -142,7 +140,7 @@ public class InputCorrection {
             return false;
         }
 
-        if(endingWeightDouble <= 0 || endingWeightDouble > 1000 || endingWeightDouble < startingWeightDouble){
+        if(endingWeightDouble <= 0 || endingWeightDouble > 1000 && endingWeightDouble > startingWeightDouble){
             alert.setHeaderText("Error: Starting Weight - wrong input.");
             alert.setContentText("Ending Weight value has to be an real number greater than 0 and starting weight, but smaller than 1 000.");
             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
@@ -151,7 +149,4 @@ public class InputCorrection {
         }
         return true;
     }
-
-
-
 }

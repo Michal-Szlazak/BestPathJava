@@ -1,10 +1,5 @@
 package com.example.bestpath;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.control.Button;
-import javafx.scene.paint.Color;
-
 public class PathController {
 /*
     public void setFindButton(Button findButton, Graph currentGraph){
